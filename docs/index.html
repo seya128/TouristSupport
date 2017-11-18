@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="app.css">
+</head>
+
+<body>
+
+    <!--ここにHTMLを記載する-->
+    <div id="app">
+        <h3>My Google Maps Demo</h3>
+
+        <div id="map"></div>
+
+        <div v-if="markers[0]" id="marker_list">
+            場所
+            <div v-for="(marker,index) in markers">
+                <div v-if="index>0">
+                    <a :href="getRouteUrl(markers[index-1].position,marker.position)" target="_blank">経路</a>
+                </div>
+                <div>
+                    {{marker.label}} {{marker.position}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://npmcdn.com/vue/dist/vue.min.js"></script>
+    <script src="app.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4YXKwNVFHIeIHFfab_XcdKAheFdq_95I&callback=app.initMap" async
+        defer></script>
+</body>
+
+</html>
