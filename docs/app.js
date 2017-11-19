@@ -176,7 +176,7 @@ var app = {
 				fillColor: "#FFBBBB",                //塗り潰し色
 				fillOpacity: 0.8,                    //塗り潰し透過率
 				path: google.maps.SymbolPath.CIRCLE, //円を指定
-				scale: 10,                           //円のサイズ
+				scale: 5,                           //円のサイズ
 				strokeColor: "#FF0000",              //枠の色
 				strokeWeight: 1.0                    //枠の透過率
 			    },
