@@ -17,6 +17,9 @@ var app = {
         });
         // place service
         this.placeService = new google.maps.places.PlacesService(map);
+        // directions service
+        this.directionsService = new google.maps.DirectionsService();
+        
 
         // サーチボックス
         var input = document.getElementById('pac-input');
@@ -95,7 +98,13 @@ var app = {
             }
             if (event.placeId)
                 point.placeId = event.placeId;
-
+            
+            // ルート検索
+            var index = this.markers.length;
+            if (index >= 1)
+                this.getRoute(this.markers[index-1].position, point.latLng);
+            
+            // スポット追加
             this.placeMarker(point, map);
         }.bind(this));
     },
@@ -129,7 +138,21 @@ var app = {
         } else {
             this.markers.push(marker);
         }
-    },
+
+   },
+
+   // ルート取得
+   getRoute: function(org, dist) {
+       console.log("org : " + org);
+       console.log("dist : " + dist);
+
+       var request = {
+        origin: org,
+        destination: dist,
+        travelMode: "DRIVING",
+
+       }
+   },
 
     // RESAS APIから観光スポット取得
     getSpots: function (pos) {
