@@ -16,17 +16,17 @@
         <div id="map"></div>
 
         <div v-if="markers[0]" id="marker_list">
-            場所
+            Locations
             <div v-for="(marker,index) in markers">
                 <div v-if="index>0">
-                    <a :href="getRouteUrl(markers[index-1].position,marker.position)" target="_blank">経路</a>
+                    <a :href="getRouteUrl(markers[index-1].position,marker.position)" target="_blank">Route</a>
                 </div>
                 <div>
                     {{marker.label}} {{getName(marker)}}
                 </div>
             </div>
         </div>
-        <div v-else>※行きたい場所を、いくつか地図上で選択してください。</div>
+        <div v-else>Click on tourism spots on this map!</div>
     </div>
 
 

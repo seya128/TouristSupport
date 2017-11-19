@@ -1,4 +1,22 @@
 var map, initPos;
+
+function calcDistance(spot, pos) {
+    var x = (spot.lat - pos.lat()) / 0.000008983148616;
+    var y = (spot.lng - pos.lng()) / 0.000010966382364;
+    //var x = spot.lat - pos.lat();
+    //var y = spot.lng - pos.lng();
+    var dist = Math.sqrt(x * x + y * y);
+    /*
+    if (spot.resourceName.indexOf("名古屋") >= 0) {
+	console.log("MapPosition lat: "+pos.lat()+", lng: "+pos.lng());
+	console.log(spot.resourceName+" lat: "+spot.lat+", lng: "+spot.lng);
+	console.log(spot.resourceName+" dist: "+dist);
+    }
+    */
+    return dist;
+}
+
+
 var app = {
     markers: [],
 
@@ -146,17 +164,37 @@ var app = {
             //console.log(JSON.stringify(ret));
             var prefCode = ret.result.prefecture.pcode;
             var cityCode = ret.result.municipality.mcode;
-            console.log("prefCode: "+prefCode);
-            console.log("cityCode: "+cityCode);
-            
-            
-            // FIXME!!
-            
-            
-            //deferred.resolve();
-            }
+            //console.log("prefCode: "+prefCode);
+            //console.log("cityCode: "+cityCode);
+
+            $.ajax({
+		type: 'GET',
+		url: resasSpotsApiUrl,
+		headers: { 'X-API-KEY': apiKey },
+		data: {cityCode: "-", prefCode: prefCode},
+		dataType: 'json',
+		success: function(ret){
+		    var sorted = ret.result.data.sort(function(a, b) {
+			var distA = calcDistance(a, pos);
+			var distB = calcDistance(b, pos);
+			if (distA < distB) return -1;
+			if (distA > distB) return 1;
+			return 0;
+		    });
+		    //console.log(JSON.stringify(sorted));
+		    sorted.forEach(function(spot) {
+			//(spot.lat, apot.lng)
+		    });
+		    // FIXME!!
+		    
+		    
+		}
+	    });
+	    //defer.resolve();
+
+	    }
         });
-        }
+    }
     
 
 };
