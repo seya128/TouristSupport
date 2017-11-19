@@ -6,7 +6,9 @@ var app = {
     initMap: function () {
         // 初期マーカー位置（JR大阪駅）
         initPos = new google.maps.LatLng(34.702485, 135.495951);
-
+	// RESAS APIから観光スポット取得
+	var spots = this.getSpots(initPos); 
+	
         // マップ生成
         map = new google.maps.Map(document.getElementById('map'), {
             center: initPos,
@@ -109,6 +111,33 @@ var app = {
         // if(app.markers.length >= 2) {
         //     app.markers[app.markers.length-2].setLabel("A");
         // }
+    },
+
+    // RESAS APIから観光スポット取得
+    getSpots: function (pos) {
+	var resasSpotsUrl = 'https://opendata.resas-portal.go.jp/api/v1/tourism/attractions';
+	var rgeoApiUrl = "https://www.finds.jp/ws/rgeocode.php";
+	var apiKey = ""; // RESASのAPI Key
+	$.ajax({
+	    type: 'GET',
+	    url: rgeoApiUrl,
+	    //headers: { 'X-API-KEY': apiKey },
+	    data: {lat: pos.lat(), lon: pos.lng(), json: "1"},
+	    dataType: 'json',
+	    success: function(ret){
+		//console.log(JSON.stringify(ret));
+		var prefCode = ret.result.prefecture.pcode;
+		var cityCode = ret.result.municipality.mcode;
+		console.log("prefCode: "+prefCode);
+		console.log("cityCode: "+cityCode);
+		
+		
+		// FIXME!!
+		
+		
+		//deferred.resolve();
+	    }
+	});
     }
 
 
