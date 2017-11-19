@@ -158,7 +158,7 @@ var app = {
 		data: {cityCode: "-", prefCode: prefCode},
 		dataType: 'json',
 		success: function(ret){
-		    console.log(JSON.stringify(ret));
+		    //console.log(JSON.stringify(ret));
 		    var sorted = ret.result.data.sort(function(a, b) {
 			var distA = calcDistance(a, pos);
 			var distB = calcDistance(b, pos);
