@@ -109,6 +109,14 @@ var app = {
             animation: google.maps.Animation.DROP,
             label: "" + (this.markers.length + 1),
             position: point.latLng,
+	    icon: {
+		fillColor: "#FF0000",                //塗り潰し色
+		fillOpacity: 0.8,                    //塗り潰し透過率
+		path: google.maps.SymbolPath.CIRCLE, //円を指定
+		scale: 16,                           //円のサイズ
+		strokeColor: "#FF0000",              //枠の色
+		strokeWeight: 1.0                    //枠の透過率
+	    },
             map: map
         });
         if (point.title) {
