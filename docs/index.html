@@ -12,6 +12,7 @@
     <div id="app">
         <h3>My Google Maps Demo</h3>
 
+        <input id="pac-input" class="controls" type="text" placeholder="Search Box">
         <div id="map"></div>
 
         <div v-if="markers[0]" id="marker_list">
@@ -21,7 +22,9 @@
                     <a :href="getRouteUrl(markers[index-1].position,marker.position)" target="_blank">経路</a>
                 </div>
                 <div>
-                    {{marker.label}} {{marker.position}}
+                    {{marker.label}} 
+                    <span v-if="marker.title">{{marker.title}}</span>
+                    <span v-else>{{marker.position}}</span>
                 </div>
             </div>
         </div>
@@ -30,7 +33,7 @@
 
     <script src="https://npmcdn.com/vue/dist/vue.min.js"></script>
     <script src="app.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4YXKwNVFHIeIHFfab_XcdKAheFdq_95I&callback=app.initMap" async
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4YXKwNVFHIeIHFfab_XcdKAheFdq_95I&libraries=places&callback=app.initMap" async
         defer></script>
 </body>
 
