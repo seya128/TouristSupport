@@ -4,15 +4,15 @@ var app = {
 
     // MAP初期化
     initMap: function () {
-        // 初期マーカー位置（JR大阪駅）
-        initPos = new google.maps.LatLng(34.702485, 135.495951);
+        // 初期マーカー位置
+        initPos = new google.maps.LatLng(35.1681151,136.8764946);
         // RESAS APIから観光スポット取得
         var spots = this.getSpots(initPos);
 
         // マップ生成
         map = new google.maps.Map(document.getElementById('map'), {
             center: initPos,
-            zoom: 14,
+            zoom: 12,
             // mapTypeId: 'roadmap'
         });
         // place service
