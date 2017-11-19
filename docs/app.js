@@ -3,7 +3,6 @@ var map, initPos;
 var app = {
     markers: [],
     routes: [],
-    routeRequest: {},
 
     // MAP初期化
     initMap: function () {
@@ -31,16 +30,16 @@ var app = {
         map.addListener('bounds_changed', function () {
             searchBox.setBounds(map.getBounds());
         });
-	map.addListener( "drag", function ( arg ) {
-	    var mapCenter = map.getCenter();
-	    var dist = calcDragDistance(mapCenter, initPos);
-	    //console.log("Map center: ("+mapCenter.lat()+", "+mapCenter.lng());
-	    //console.log("Drag distance: " +dist);
-	    if (dist >= 600) {   // ある程度地図がドラッグされると
-		spots = app.getSpots(mapCenter); // RESASから取り直し
-		initPos = mapCenter;
-	    }
-	}) ;
+        map.addListener("drag", function (arg) {
+            var mapCenter = map.getCenter();
+            var dist = calcDragDistance(mapCenter, initPos);
+            //console.log("Map center: ("+mapCenter.lat()+", "+mapCenter.lng());
+            //console.log("Drag distance: " +dist);
+            if (dist >= 600) {   // ある程度地図がドラッグされると
+                spots = app.getSpots(mapCenter); // RESASから取り直し
+                initPos = mapCenter;
+            }
+        });
         var s_markers = [];
         // Listen for the event fired when the user selects a prediction and retrieve
         // more details for that place.
@@ -161,32 +160,49 @@ var app = {
         // console.log("org : " + org);
         // console.log("dist : " + dist);
 
-        app.request = {
+        request = {
             origin: org,
             destination: dist,
             travelMode: "DRIVING",
-
         };
 
         var route = {};
 
-        this.directionsService.route(app.request, function (result, status) {
+        this.directionsService.route(request, function (result, status) {
             if (status == 'OK') {
                 // console.log(result.routes[0].legs[0]);
                 route.car = result.routes[0].legs[0];
 
-                app.request.travelMode = "TRANSIT";
-                console.log(app.request);
-                app.directionsService.route(app.request, function (result, status) {
+                request = {
+                    origin: org,
+                    destination: dist,
+                    travelMode: "WALKING",
+                };
+                app.directionsService.route(request, function (result, status) {
                     if (status == 'OK') {
                         console.log(result);
-                        
+                        route.walk = result.routes[0].legs[0];
+
+                        request = {
+                            origin: org,
+                            destination: dist,
+                            travelMode: "TRANSIT",
+                            transitOptions: {
+                                modes: ['BUS','RAIL','SUBWAY','TRAIN','TRAM'],
+                              },
+                        };
+                        app.directionsService.route(request, function (result, status) {
+                            console.log(status);
+                            if (status == 'OK') {
+                                console.log(result);
+                                route.transit = result.routes[0].legs[0];
+                            }
+                            app.routes.push(route);
+                        });
                     }
                 });
-                app.routes.push(route);
             }
         });
-
     },
 
     // RESAS APIから観光スポット取得

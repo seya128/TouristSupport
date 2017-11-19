@@ -19,9 +19,14 @@
             Locations
             <div v-for="(marker,index) in markers">
                 <div v-if="index>0">
-                    <div v-if="routes[index-1]">
-                        [CAR] {{routes[index-1].car.distance.text}}({{routes[index-1].car.duration.text}})
-                    </div>
+                    <span v-if="routes[index-1]">
+                        [CAR: {{routes[index-1].car.distance.text}} ({{routes[index-1].car.duration.text}})] [WALK: {{routes[index-1].walk.distance.text}}
+                        ({{routes[index-1].walk.duration.text}})]
+                        <template v-if="routes[index-1].transit">
+                            [TRANSIT: {{routes[index-1].transit.distance.text}} ({{routes[index-1].transit.duration.text}})]
+                        </template>
+                    </span>
+                    ->
                     <a :href="getRouteUrl(markers[index-1].position,marker.position)" target="_blank">Route</a>
                 </div>
                 <div>
@@ -36,8 +41,8 @@
     <script src="https://npmcdn.com/vue/dist/vue.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="app.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4YXKwNVFHIeIHFfab_XcdKAheFdq_95I&libraries=places&callback=app.initMap" async
-        defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4YXKwNVFHIeIHFfab_XcdKAheFdq_95I&libraries=places&callback=app.initMap"
+        async defer></script>
 </body>
 
 </html>
