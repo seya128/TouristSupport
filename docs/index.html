@@ -22,9 +22,7 @@
                     <a :href="getRouteUrl(markers[index-1].position,marker.position)" target="_blank">経路</a>
                 </div>
                 <div>
-                    {{marker.label}} 
-                    <span v-if="marker.title">{{marker.title}}</span>
-                    <span v-else>{{marker.position}}</span>
+                    {{marker.label}} {{getName(marker)}}
                 </div>
             </div>
         </div>
