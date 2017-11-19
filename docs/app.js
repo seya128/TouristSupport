@@ -31,6 +31,16 @@ var app = {
         map.addListener('bounds_changed', function () {
             searchBox.setBounds(map.getBounds());
         });
+	map.addListener( "drag", function ( arg ) {
+	    var mapCenter = map.getCenter();
+	    var dist = calcDragDistance(mapCenter, initPos);
+	    //console.log("Map center: ("+mapCenter.lat()+", "+mapCenter.lng());
+	    //console.log("Drag distance: " +dist);
+	    if (dist >= 600) {   // ある程度地図がドラッグされると
+		spots = app.getSpots(mapCenter); // RESASから取り直し
+		initPos = mapCenter;
+	    }
+	}) ;
         var s_markers = [];
         // Listen for the event fired when the user selects a prediction and retrieve
         // more details for that place.
@@ -284,17 +294,14 @@ new Vue({
 function calcDistance(spot, pos) {
     var x = (spot.lat - pos.lat()) / 0.000008983148616;
     var y = (spot.lng - pos.lng()) / 0.000010966382364;
-    //var x = spot.lat - pos.lat();
-    //var y = spot.lng - pos.lng();
     var dist = Math.sqrt(x * x + y * y);
-    /*
-    if (spot.resourceName.indexOf("名古屋") >= 0) {
-	console.log("MapPosition lat: "+pos.lat()+", lng: "+pos.lng());
-	console.log(spot.resourceName+" lat: "+spot.lat+", lng: "+spot.lng);
-	console.log(spot.resourceName+" dist: "+dist);
-    }
-    */
     return dist;
 }
 
 
+function calcDragDistance(pos1, pos2) {
+    var x = (pos1.lat() - pos2.lat()) / 0.000008983148616;
+    var y = (pos2.lng() - pos2.lng()) / 0.000010966382364;
+    var dist = Math.sqrt(x * x + y * y);
+    return dist;
+}
