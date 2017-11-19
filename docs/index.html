@@ -19,6 +19,9 @@
             Locations
             <div v-for="(marker,index) in markers">
                 <div v-if="index>0">
+                    <div v-if="routes[index-1]">
+                        [CAR] {{routes[index-1].car.distance.text}}({{routes[index-1].car.duration.text}})
+                    </div>
                     <a :href="getRouteUrl(markers[index-1].position,marker.position)" target="_blank">Route</a>
                 </div>
                 <div>

@@ -2,11 +2,12 @@ var map, initPos;
 
 var app = {
     markers: [],
+    routes: [],
 
     // MAP初期化
     initMap: function () {
         // 初期マーカー位置
-        initPos = new google.maps.LatLng(35.1681151,136.8764946);
+        initPos = new google.maps.LatLng(35.1681151, 136.8764946);
         // RESAS APIから観光スポット取得
         var spots = this.getSpots(initPos);
 
@@ -20,7 +21,7 @@ var app = {
         this.placeService = new google.maps.places.PlacesService(map);
         // directions service
         this.directionsService = new google.maps.DirectionsService();
-        
+
 
         // サーチボックス
         var input = document.getElementById('pac-input');
@@ -99,18 +100,18 @@ var app = {
             }
             if (event.placeId)
                 point.placeId = event.placeId;
-            
+
             // ルート検索
             var index = this.markers.length;
             if (index >= 1)
-                this.getRoute(this.markers[index-1].position, point.latLng);
-            
+                this.getRoute(this.markers[index - 1].position, point.latLng);
+
             // スポット追加
             this.placeMarker(point, map);
         }.bind(this));
     },
 
-    
+
     // マーカー追加
     placeMarker: function (point, map) {
 
@@ -141,91 +142,102 @@ var app = {
             this.markers.push(marker);
         }
 
-   },
+    },
 
-   // ルート取得
-   getRoute: function(org, dist) {
-       console.log("org : " + org);
-       console.log("dist : " + dist);
+    // ルート取得
+    getRoute: function (org, dist) {
+        // console.log("org : " + org);
+        // console.log("dist : " + dist);
 
-       var request = {
-        origin: org,
-        destination: dist,
-        travelMode: "DRIVING",
+        var request = {
+            origin: org,
+            destination: dist,
+            travelMode: "DRIVING",
 
-       }
-   },
+        };
+
+        var result={};
+
+        this.directionsService.route(request, function (result, status) {
+            if (status == 'OK') {
+                // console.log(result.routes[0].legs[0]);
+                result.car = result.routes[0].legs[0];
+                app.routes.push(result);
+            }
+        });
+
+    },
 
     // RESAS APIから観光スポット取得
     getSpots: function (pos) {
         var resasSpotsApiUrl = 'https://opendata.resas-portal.go.jp/api/v1/tourism/attractions';
         var rgeoApiUrl = "https://www.finds.jp/ws/rgeocode.php";
-	var apiKey = "M1o2g9y0ORtM4StEcRPMBxiBwFr6lTPrZa9cXyJh"; 
+        var apiKey = "M1o2g9y0ORtM4StEcRPMBxiBwFr6lTPrZa9cXyJh";
         $.ajax({
             type: 'GET',
             url: rgeoApiUrl,
             //headers: { 'X-API-KEY': apiKey },
-            data: {lat: pos.lat(), lon: pos.lng(), json: "1"},
+            data: { lat: pos.lat(), lon: pos.lng(), json: "1" },
             dataType: 'json',
-            success: function(ret){
-            //console.log(JSON.stringify(ret));
-            var prefCode = ret.result.prefecture.pcode;
-            var cityCode = ret.result.municipality.mcode;
-            console.log("prefCode: "+prefCode);
-            console.log("cityCode: "+cityCode);
+            success: function (ret) {
+                //console.log(JSON.stringify(ret));
+                var prefCode = ret.result.prefecture.pcode;
+                var cityCode = ret.result.municipality.mcode;
+                console.log("prefCode: " + prefCode);
+                console.log("cityCode: " + cityCode);
 
-            $.ajax({
-		type: 'GET',
-		url: resasSpotsApiUrl,
-		headers: { 'X-API-KEY': apiKey },
-		data: {cityCode: "-", prefCode: prefCode},
-		dataType: 'json',
-		success: function(ret){
-		    //console.log(JSON.stringify(ret));
-		    var sorted = ret.result.data.sort(function(a, b) {
-			var distA = calcDistance(a, pos);
-			var distB = calcDistance(b, pos);
-			if (distA < distB) return -1;
-			if (distA > distB) return 1;
-			return 0;
-		    });
-		    //console.log(JSON.stringify(sorted));
-		    sorted.forEach(function(spot) {
-			var marker = new google.maps.Marker({
-			    position: spot,
-			    map: map,
-			    title: spot.resourceName,
-			    icon: {
-				fillColor: "#FFBBBB",  //塗り潰し色
-				fillOpacity: 0.8,  //塗り潰し透過率
-				path: google.maps.SymbolPath.CIRCLE, //円を指定
-				scale: 5,  //円のサイズ
-				strokeColor: "#FF0000",  //枠の色
-				strokeWeight: 1.0  //枠の透過率
-			    },
-			    
-			});
-			marker.addListener("click", function (argument) {
-			    
-			    var point = {
-				latLng: new google.maps.LatLng(this.position.lat(), this.position.lng()),
-				title: this.title
-			    };
-			    app.placeMarker(point, map);
-			}.bind(marker));
+                $.ajax({
+                    type: 'GET',
+                    url: resasSpotsApiUrl,
+                    headers: { 'X-API-KEY': apiKey },
+                    data: { cityCode: "-", prefCode: prefCode },
+                    dataType: 'json',
+                    success: function (ret) {
+                        //console.log(JSON.stringify(ret));
+                        var sorted = ret.result.data.sort(function (a, b) {
+                            var distA = calcDistance(a, pos);
+                            var distB = calcDistance(b, pos);
+                            if (distA < distB) return -1;
+                            if (distA > distB) return 1;
+                            return 0;
+                        });
+                        //console.log(JSON.stringify(sorted));
+                        sorted.forEach(function (spot) {
+                            var marker = new google.maps.Marker({
+                                position: spot,
+                                map: map,
+                                title: spot.resourceName,
+                                icon: {
+                                    fillColor: "#FFBBBB",  //塗り潰し色
+                                    fillOpacity: 0.8,  //塗り潰し透過率
+                                    path: google.maps.SymbolPath.CIRCLE, //円を指定
+                                    scale: 5,  //円のサイズ
+                                    strokeColor: "#FF0000",  //枠の色
+                                    strokeWeight: 1.0  //枠の透過率
+                                },
 
-		    });
-		    // FIXME!!
-		    
-		    
-		}
-	    });
-	    //defer.resolve();
+                            });
+                            marker.addListener("click", function (argument) {
 
-	    }
+                                var point = {
+                                    latLng: new google.maps.LatLng(this.position.lat(), this.position.lng()),
+                                    title: this.title
+                                };
+                                app.placeMarker(point, map);
+                            }.bind(marker));
+
+                        });
+                        // FIXME!!
+
+
+                    }
+                });
+                //defer.resolve();
+
+            }
         });
     }
-    
+
 
 };
 
