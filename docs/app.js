@@ -1,4 +1,5 @@
 var map, initPos;
+
 var app = {
     markers: [],
 
@@ -109,6 +110,7 @@ var app = {
         }.bind(this));
     },
 
+    
     // マーカー追加
     placeMarker: function (point, map) {
 
@@ -156,9 +158,9 @@ var app = {
 
     // RESAS APIから観光スポット取得
     getSpots: function (pos) {
-        var resasSpotsUrl = 'https://opendata.resas-portal.go.jp/api/v1/tourism/attractions';
+        var resasSpotsApiUrl = 'https://opendata.resas-portal.go.jp/api/v1/tourism/attractions';
         var rgeoApiUrl = "https://www.finds.jp/ws/rgeocode.php";
-        var apiKey = ""; // RESASのAPI Key
+	var apiKey = "M1o2g9y0ORtM4StEcRPMBxiBwFr6lTPrZa9cXyJh"; 
         $.ajax({
             type: 'GET',
             url: rgeoApiUrl,
@@ -171,20 +173,61 @@ var app = {
             var cityCode = ret.result.municipality.mcode;
             console.log("prefCode: "+prefCode);
             console.log("cityCode: "+cityCode);
-            
-            
-            // FIXME!!
-            
-            
-            //deferred.resolve();
-            }
+
+            $.ajax({
+		type: 'GET',
+		url: resasSpotsApiUrl,
+		headers: { 'X-API-KEY': apiKey },
+		data: {cityCode: "-", prefCode: prefCode},
+		dataType: 'json',
+		success: function(ret){
+		    //console.log(JSON.stringify(ret));
+		    var sorted = ret.result.data.sort(function(a, b) {
+			var distA = calcDistance(a, pos);
+			var distB = calcDistance(b, pos);
+			if (distA < distB) return -1;
+			if (distA > distB) return 1;
+			return 0;
+		    });
+		    //console.log(JSON.stringify(sorted));
+		    sorted.forEach(function(spot) {
+			var marker = new google.maps.Marker({
+			    position: spot,
+			    map: map,
+			    title: spot.resourceName,
+			    icon: {
+				fillColor: "#FFBBBB",  //塗り潰し色
+				fillOpacity: 0.8,  //塗り潰し透過率
+				path: google.maps.SymbolPath.CIRCLE, //円を指定
+				scale: 5,  //円のサイズ
+				strokeColor: "#FF0000",  //枠の色
+				strokeWeight: 1.0  //枠の透過率
+			    },
+			    
+			});
+			marker.addListener("click", function (argument) {
+			    
+			    var point = {
+				latLng: new google.maps.LatLng(this.position.lat(), this.position.lng()),
+				title: this.title
+			    };
+			    app.placeMarker(point, map);
+			}.bind(marker));
+
+		    });
+		    // FIXME!!
+		    
+		    
+		}
+	    });
+	    //defer.resolve();
+
+	    }
         });
-        }
+    }
     
 
 };
-
-
 
 
 
@@ -213,3 +256,22 @@ new Vue({
         }
     }
 });
+
+
+function calcDistance(spot, pos) {
+    var x = (spot.lat - pos.lat()) / 0.000008983148616;
+    var y = (spot.lng - pos.lng()) / 0.000010966382364;
+    //var x = spot.lat - pos.lat();
+    //var y = spot.lng - pos.lng();
+    var dist = Math.sqrt(x * x + y * y);
+    /*
+    if (spot.resourceName.indexOf("名古屋") >= 0) {
+	console.log("MapPosition lat: "+pos.lat()+", lng: "+pos.lng());
+	console.log(spot.resourceName+" lat: "+spot.lat+", lng: "+spot.lng);
+	console.log(spot.resourceName+" dist: "+dist);
+    }
+    */
+    return dist;
+}
+
+
