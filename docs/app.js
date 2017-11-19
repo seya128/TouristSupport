@@ -3,6 +3,7 @@ var map, initPos;
 var app = {
     markers: [],
     routes: [],
+    routeRequest: {},
 
     // MAP初期化
     initMap: function () {
@@ -101,11 +102,6 @@ var app = {
             if (event.placeId)
                 point.placeId = event.placeId;
 
-            // ルート検索
-            var index = this.markers.length;
-            if (index >= 1)
-                this.getRoute(this.markers[index - 1].position, point.latLng);
-
             // スポット追加
             this.placeMarker(point, map);
         }.bind(this));
@@ -114,6 +110,12 @@ var app = {
 
     // マーカー追加
     placeMarker: function (point, map) {
+
+        // ルート検索
+        var index = this.markers.length;
+        if (index >= 1) {
+            this.getRoute(this.markers[index - 1].position, point.latLng);
+        }
 
         var marker = new google.maps.Marker({
             animation: google.maps.Animation.DROP,
@@ -126,13 +128,13 @@ var app = {
             marker.setTitle(point.title);
             this.markers.push(marker);
         } else if (point.placeId) {
-            console.log(marker);
+            //console.log(marker);
             // place idがあれば、詳細検索して名前をセット
             request = {
                 placeId: point.placeId,
             };
             this.placeService.getDetails(request, function callback(place, status) {
-                console.log(this);
+                //console.log(this);
                 if (status == google.maps.places.PlacesServiceStatus.OK) {
                     this.setTitle(place.name);
                 }
@@ -149,20 +151,29 @@ var app = {
         // console.log("org : " + org);
         // console.log("dist : " + dist);
 
-        var request = {
+        app.request = {
             origin: org,
             destination: dist,
             travelMode: "DRIVING",
 
         };
 
-        var result={};
+        var route = {};
 
-        this.directionsService.route(request, function (result, status) {
+        this.directionsService.route(app.request, function (result, status) {
             if (status == 'OK') {
                 // console.log(result.routes[0].legs[0]);
-                result.car = result.routes[0].legs[0];
-                app.routes.push(result);
+                route.car = result.routes[0].legs[0];
+
+                app.request.travelMode = "TRANSIT";
+                console.log(app.request);
+                app.directionsService.route(app.request, function (result, status) {
+                    if (status == 'OK') {
+                        console.log(result);
+                        
+                    }
+                });
+                app.routes.push(route);
             }
         });
 
