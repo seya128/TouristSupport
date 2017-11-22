@@ -3,35 +3,42 @@
 
 <head>
     <meta charset="utf-8">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" media="screen,projection"
+    />
     <link rel="stylesheet" type="text/css" href="app.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
 <body>
 
     <!--ここにHTMLを記載する-->
-    <div id="app">
-      <img height="60" src="tscj_caps.png"> 
-			
-
+    <div id="app" class="container">
+        <img height="40px" src="tscj_caps.png">
         <input id="pac-input" class="controls" type="text" placeholder="Search Box">
         <div id="map"></div>
 
         <div v-if="markers[0]" id="marker_list">
             Locations
             <div v-for="(marker,index) in markers">
-                <div v-if="index>0">
-                    <span v-if="routes[index-1]">
-                        [CAR: {{routes[index-1].car.distance.text}} ({{routes[index-1].car.duration.text}})] [WALK: {{routes[index-1].walk.distance.text}}
-                        ({{routes[index-1].walk.duration.text}})]
-                        <template v-if="routes[index-1].transit">
-                            [TRANSIT: {{routes[index-1].transit.distance.text}} ({{routes[index-1].transit.duration.text}})]
-                        </template>
-                    </span>
-                    ->
-                    <a :href="getRouteUrl(markers[index-1].position,marker.position)" target="_blank">Route</a>
+                <div v-if="index>0" class="route">
+                    <div class="route_inner">
+                        <span v-if="routes[index-1]">
+                            <i class="tiny material-icons">directions_car</i>{{routes[index-1].car.distance.text}}({{routes[index-1].car.duration.text}})
+                            <i class="tiny material-icons">directions_walk</i>{{routes[index-1].walk.distance.text}}({{routes[index-1].walk.duration.text}})
+                            <template v-if="routes[index-1].transit">
+                                <i class="tiny material-icons">directions_transit</i>{{routes[index-1].transit.distance.text}} ({{routes[index-1].transit.duration.text}})
+                            </template>
+                        </span>
+                        ->
+                        <a :href="getRouteUrl(markers[index-1].position,marker.position)" target="_blank">
+                            <i class="tiny material-icons">directions</i>
+                        </a>
+                    </div>
                 </div>
-                <div>
-                    {{marker.label}} {{getName(marker)}}
+                <div class="point">
+                    <div class="label">{{marker.label}}</div>
+                    <div class="name"> {{getName(marker)}}</div>
                 </div>
             </div>
         </div>
@@ -41,6 +48,7 @@
 
     <script src="https://npmcdn.com/vue/dist/vue.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
     <script src="app.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4YXKwNVFHIeIHFfab_XcdKAheFdq_95I&libraries=places&callback=app.initMap"
         async defer></script>
